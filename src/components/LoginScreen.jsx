@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Leaf, GraduationCap, Wrench, Eye, EyeOff, ArrowRight, UserPlus, LogIn, KeyRound } from 'lucide-react';
-import firebase, { auth, db, HOSTEL, STAFF_CODE } from '../lib/firebase';
+import { Leaf, GraduationCap, Wrench, Eye, EyeOff, ArrowRight, UserPlus, LogIn } from 'lucide-react';
+import firebase, { auth, db, HOSTEL } from '../lib/firebase';
 
 export function LoginScreen({ roleMode, setRoleMode }) {
   const [authMode, setAuthMode] = useState('login');
@@ -12,7 +12,6 @@ export function LoginScreen({ roleMode, setRoleMode }) {
   const [regNo, setRegNo] = useState('');
   const [floor, setFloor] = useState(1);
   const [room, setRoom] = useState('');
-  const [staffCode, setStaffCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -26,40 +25,18 @@ export function LoginScreen({ roleMode, setRoleMode }) {
       if (authMode === 'login') {
         await auth.signInWithEmailAndPassword(email, password);
       } else {
-        // ── Signup validations ──
-        if (roleMode === 'student') {
-          if (!fullName.trim() || !regNo.trim()) { setError('Name and register number are required.'); setLoading(false); return; }
-        }
-        if (roleMode === 'staff') {
-          if (staffCode.trim() !== STAFF_CODE) {
-            setError('Invalid staff access code. Contact hostel admin for the correct code.');
-            setLoading(false);
-            return;
-          }
-        }
-
+        if (!fullName.trim() || !regNo.trim()) { setError('Name and register number are required.'); setLoading(false); return; }
         const cred = await auth.createUserWithEmailAndPassword(email, password);
-
-        // ── Store in `users` collection ──
-        const userData = {
-          uid: cred.user.uid,
+        await db.collection('students').doc(cred.user.uid).set({
+          name: fullName.trim(),
+          regNo: regNo.trim(),
+          floor: Number(floor),
+          room: String(room).trim(),
           email: email.trim(),
           role: roleMode,
+          hostel: HOSTEL.name,
           createdAt: firebase.firestore.Timestamp.now(),
-        };
-
-        // Student-specific fields
-        if (roleMode === 'student') {
-          userData.name = fullName.trim();
-          userData.regNo = regNo.trim();
-          userData.floor = Number(floor);
-          userData.room = String(room).trim();
-          userData.hostel = HOSTEL.name;
-        } else {
-          userData.name = fullName.trim() || 'Staff';
-        }
-
-        await db.collection('users').doc(cred.user.uid).set(userData);
+        });
       }
     } catch (err) {
       const msg = err.code === 'auth/user-not-found' ? 'No account found with this email.'
@@ -167,67 +144,38 @@ export function LoginScreen({ roleMode, setRoleMode }) {
                 transition={{ duration: 0.3 }}
                 className="space-y-4 overflow-hidden"
               >
-                {/* Name field — shown for both student and staff */}
                 <div>
                   <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1.5 ml-1">Full Name</label>
-                  <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder={roleMode === 'staff' ? 'Admin Name' : 'Ananya Rao'} className="clay-input" />
+                  <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Ananya Rao" className="clay-input" />
                 </div>
-
-                {/* Student-only fields */}
-                {roleMode === 'student' && (
-                  <>
-                    <div>
-                      <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1.5 ml-1">Register Number</label>
-                      <input type="text" value={regNo} onChange={(e) => setRegNo(e.target.value)} placeholder="22CS1043" className="clay-input font-mono" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1.5 ml-1">Floor</label>
-                        <select value={floor} onChange={(e) => setFloor(e.target.value)} className="clay-input">
-                          {Array.from({ length: HOSTEL.floors }, (_, i) => i + 1).map((f) => (
-                            <option key={f} value={f}>Floor {f}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1.5 ml-1">Room No.</label>
-                        <input type="text" value={room} onChange={(e) => setRoom(e.target.value)} placeholder="512" className="clay-input font-mono" />
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {/* Staff Access Code — only shown for staff signup */}
-                {roleMode === 'staff' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="space-y-1.5"
-                  >
-                    <label className="text-xs font-bold text-indigo-600 dark:text-indigo-400 block mb-1.5 ml-1 flex items-center gap-1.5">
-                      <KeyRound className="w-3.5 h-3.5" />
-                      Staff Access Code
-                    </label>
-                    <input
-                      type="password"
-                      value={staffCode}
-                      onChange={(e) => setStaffCode(e.target.value)}
-                      placeholder="Enter the access code"
-                      className="clay-input font-mono tracking-widest"
-                    />
-                    <p className="text-[11px] text-slate-400 dark:text-slate-500 ml-1">Contact hostel admin if you don't have the code.</p>
-                  </motion.div>
-                )}
+                <div>
+                  <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1.5 ml-1">Register Number</label>
+                  <input type="text" value={regNo} onChange={(e) => setRegNo(e.target.value)} placeholder="22CS1043" className="clay-input font-mono" />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1.5 ml-1">Floor</label>
+                    <select value={floor} onChange={(e) => setFloor(e.target.value)} className="clay-input">
+                      {Array.from({ length: HOSTEL.floors }, (_, i) => i + 1).map((f) => (
+                        <option key={f} value={f}>Floor {f}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1.5 ml-1">Room No.</label>
+                    <input type="text" value={room} onChange={(e) => setRoom(e.target.value)} placeholder="512" className="clay-input font-mono" />
+                  </div>
+                </div>
               </motion.div>
             )}
 
             <div>
-              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1.5 ml-1">Email Address</label>
+              <label className="text-xs font-bold text-slate-500 block mb-1.5">Email Address</label>
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@college.edu" className="clay-input" />
             </div>
 
             <div className="relative">
-              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1.5 ml-1">Password</label>
+              <label className="text-xs font-bold text-slate-500 block mb-1.5">Password</label>
               <input
                 type={showPass ? 'text' : 'password'}
                 value={password}
@@ -277,7 +225,7 @@ export function LoginScreen({ roleMode, setRoleMode }) {
 
         {/* Footer */}
         <p className="text-center text-xs font-medium text-slate-400 mt-6">
-          {HOSTEL.name} · SDG 11 &amp; 12 Aligned
+          {HOSTEL.name} · SDG 11 & 12 Aligned
         </p>
       </motion.div>
     </div>
