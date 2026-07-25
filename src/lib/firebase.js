@@ -19,6 +19,7 @@ if (!firebase.apps.length) {
 export const auth = firebase.auth();
 export const db = firebase.firestore();
 export const HOSTEL = { name: 'Krishna Hostel', floors: 8, roomsPerFloor: 30 };
+export const STAFF_CODE = 'HOSTEL2026';
 
 export const CATS = {
   'Electrical':   { label: 'Electrical', icon: 'Zap',       sla: 12, bg: '#FEF3C7', fg: '#B45309', weight: 60 },

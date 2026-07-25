@@ -52,7 +52,7 @@ export default function App() {
         return;
       }
       try {
-        // Check `users` first (new accounts), then fall back to `students` (legacy accounts)
+        // Try `users` collection first, fall back to legacy `students`
         let snap = await db.collection('users').doc(currentUser.uid).get();
         if (!snap.exists) {
           snap = await db.collection('students').doc(currentUser.uid).get();
@@ -74,6 +74,8 @@ export default function App() {
           role: pData?.role || 'student',
         };
         setProfile(finalProfile);
+        // Sync roleMode from stored role — no manual override possible
+        setRoleMode(finalProfile.role);
       } catch {
         setProfile({
           name: currentUser.displayName || 'Student',
@@ -83,6 +85,7 @@ export default function App() {
           room: '',
           role: 'student',
         });
+        setRoleMode('student');
       } finally {
         setLoading(false);
       }
@@ -173,13 +176,30 @@ export default function App() {
     );
   }
 
-  // ── Staff ──
+  // ── Staff (strictly role-based, not toggleable) ──
   if (profile?.role === 'staff') {
     return (
       <>
         <StaffDashboard onOpenLightbox={setLightboxUrl} onSignOut={handleSignOut} />
         <LightboxModal url={lightboxUrl} onClose={() => setLightboxUrl(null)} />
       </>
+    );
+  }
+
+  // ── Not Authorized guard (student trying staff route) ──
+  if (roleMode === 'staff' && profile?.role !== 'staff') {
+    return (
+      <div className="min-h-dvh flex items-center justify-center p-5">
+        <div className="app-bg" />
+        <div className="clay-card p-10 text-center max-w-sm relative z-10">
+          <div className="w-14 h-14 rounded-2xl bg-rose-100 flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl">🚫</span>
+          </div>
+          <h2 className="text-lg font-extrabold text-slate-900 dark:text-white">Not Authorized</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">Your account does not have staff access.</p>
+          <button onClick={handleSignOut} className="clay-btn mt-6 w-full py-3 text-sm">Sign Out</button>
+        </div>
+      </div>
     );
   }
 

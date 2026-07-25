@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldCheck, ArrowRight, Search, AlertTriangle, Download } from 'lucide-react';
+import { ShieldCheck, Search, AlertTriangle, Download } from 'lucide-react';
 import firebase, { db, HOSTEL, CATS } from '../lib/firebase';
 import { EmergencyBanner } from './EmergencyBanner';
 
