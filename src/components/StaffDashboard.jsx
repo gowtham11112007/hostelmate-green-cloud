@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldCheck, ArrowRight, Search, AlertTriangle, Download } from 'lucide-react';
 import firebase, { db, HOSTEL, CATS } from '../lib/firebase';
+import { EmergencyBanner } from './EmergencyBanner';
 
 export function StaffDashboard({ onOpenLightbox, onSignOut }) {
   const [tickets, setTickets] = useState([]);
@@ -80,6 +81,11 @@ export function StaffDashboard({ onOpenLightbox, onSignOut }) {
       </header>
 
       <main className="max-w-6xl mx-auto px-6 py-6 space-y-6">
+        {/* Emergency Banner */}
+        <AnimatePresence>
+          <EmergencyBanner />
+        </AnimatePresence>
+
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[

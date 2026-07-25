@@ -13,6 +13,7 @@ import { LightboxModal } from './components/LightboxModal';
 import { StaffDashboard } from './components/StaffDashboard';
 import { LoginScreen } from './components/LoginScreen';
 import { LoadingScreen } from './components/LoadingScreen';
+import { EmergencyAlert } from './components/EmergencyAlert';
 
 const pageVariants = {
   initial: { opacity: 0, y: 20, scale: 0.98 },
@@ -30,6 +31,7 @@ export default function App() {
   const [lightboxUrl, setLightboxUrl] = useState(null);
   const [tickets, setTickets] = useState([]);
   const [eco, setEco] = useState({ closed: 0, water: 0, power: 0 });
+  const [showEmergency, setShowEmergency] = useState(false);
 
   // ── Auth listener ──
   useEffect(() => {
@@ -169,7 +171,7 @@ export default function App() {
   const renderView = () => {
     switch (activeTab) {
       case 'home':
-        return <HomeView eco={eco} tickets={tickets} onNavigate={setActiveTab} onTicketClick={handleTicketClick} />;
+        return <HomeView eco={eco} tickets={tickets} onNavigate={setActiveTab} onTicketClick={handleTicketClick} onEmergency={() => setShowEmergency(true)} />;
       case 'tickets':
         return <TicketsView tickets={tickets} onTicketClick={handleTicketClick} />;
       case 'submit':
@@ -200,6 +202,10 @@ export default function App() {
 
       <AppleDock activeTab={activeTab} onSelect={setActiveTab} hasAlerts={hasAlerts} />
       <LightboxModal url={lightboxUrl} onClose={() => setLightboxUrl(null)} />
+      
+      <AnimatePresence>
+        {showEmergency && <EmergencyAlert profile={profile} onClose={() => setShowEmergency(false)} />}
+      </AnimatePresence>
     </div>
   );
 }
