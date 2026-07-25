@@ -51,8 +51,6 @@ export default function App() {
           cleanName = pData.name;
         } else if (currentUser.displayName) {
           cleanName = currentUser.displayName;
-        } else if (currentUser.email) {
-          cleanName = currentUser.email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
         }
 
         const finalProfile = {
@@ -67,7 +65,7 @@ export default function App() {
         if (finalProfile.role === 'staff') setRoleMode('staff');
       } catch {
         setProfile({
-          name: currentUser.displayName || currentUser.email?.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'Student',
+          name: currentUser.displayName || 'Student',
           email: currentUser.email || '',
           regNo: '—',
           floor: null,
