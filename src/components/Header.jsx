@@ -48,16 +48,13 @@ export function Header({ profile, hostelName }) {
           </div>
         </div>
 
-        {/* Right Side: Profile Chip instead of just initials */}
+        {/* Right Side: Avatar */}
         <motion.div
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-full bg-white border border-slate-200/60 shadow-sm cursor-pointer hover:bg-slate-50 transition-colors"
+          className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-400 to-indigo-500 text-white font-extrabold text-xs flex items-center justify-center shadow-lg shadow-brand-500/25 shrink-0 cursor-pointer"
         >
-          <span className="text-xs font-extrabold text-slate-700 hidden sm:block pl-2">{name.split(' ')[0]}</span>
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-400 to-indigo-500 text-white font-extrabold text-xs flex items-center justify-center shadow-inner">
-            {initials || <User className="w-4 h-4" />}
-          </div>
+          {initials || <User className="w-4 h-4" />}
         </motion.div>
       </div>
     </motion.header>
