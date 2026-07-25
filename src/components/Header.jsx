@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
-import { Mail, MapPin, Hash, User } from 'lucide-react';
+import { Mail, MapPin, Hash, User, Moon, Sun } from 'lucide-react';
 
-export function Header({ profile, hostelName }) {
+export function Header({ profile, hostelName, isDark, setIsDark }) {
   const name = profile?.name || 'Student';
   const email = profile?.email || '';
   const regNo = profile?.regNo && profile.regNo !== '—' ? profile.regNo : null;
@@ -24,7 +24,7 @@ export function Header({ profile, hostelName }) {
       <div className="max-w-lg mx-auto flex items-center justify-between gap-4">
         {/* Left Side: Greeting / Info */}
         <div className="flex-1 min-w-0">
-          <h1 className="text-lg font-extrabold text-slate-900 tracking-tight truncate leading-tight flex items-center gap-2">
+          <h1 className="text-lg font-extrabold text-slate-900 dark:text-white tracking-tight truncate leading-tight flex items-center gap-2">
             {name}
           </h1>
           <div className="flex items-center gap-3 mt-1.5 flex-wrap">
@@ -48,14 +48,32 @@ export function Header({ profile, hostelName }) {
           </div>
         </div>
 
-        {/* Right Side: Avatar */}
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-400 to-indigo-500 text-white font-extrabold text-xs flex items-center justify-center shadow-lg shadow-brand-500/25 shrink-0 cursor-pointer"
-        >
-          {initials || <User className="w-4 h-4" />}
-        </motion.div>
+        {/* Right Side: Toggles & Avatar */}
+        <div className="flex items-center gap-3">
+          {/* Dark Mode Toggle */}
+          <motion.button
+            whileTap={{ scale: 0.85 }}
+            onClick={() => setIsDark(!isDark)}
+            className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-amber-400 flex items-center justify-center border border-slate-200/60 dark:border-slate-700/60 shadow-inner transition-colors"
+          >
+            <motion.div
+              initial={false}
+              animate={{ rotate: isDark ? 360 : 0, scale: isDark ? 1.1 : 1 }}
+              transition={{ type: 'spring', stiffness: 200, damping: 10 }}
+            >
+              {isDark ? <Moon className="w-4 h-4" /> : <Sun className="w-5 h-5" />}
+            </motion.div>
+          </motion.button>
+
+          {/* Avatar */}
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-400 to-indigo-500 text-white font-extrabold text-xs flex items-center justify-center shadow-lg shadow-brand-500/25 shrink-0 cursor-pointer"
+          >
+            {initials || <User className="w-4 h-4" />}
+          </motion.div>
+        </div>
       </div>
     </motion.header>
   );

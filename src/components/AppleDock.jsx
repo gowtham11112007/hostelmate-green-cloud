@@ -1,12 +1,12 @@
 import { useRef } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { Home, ListFilter, PlusCircle, Bell, User } from 'lucide-react';
+import { Home, ListFilter, PlusCircle, Megaphone, User } from 'lucide-react';
 
 const items = [
   { id: 'home', title: 'Home', Icon: Home },
   { id: 'tickets', title: 'Tickets', Icon: ListFilter },
   { id: 'submit', title: 'New', Icon: PlusCircle, accent: true },
-  { id: 'alerts', title: 'Alerts', Icon: Bell },
+  { id: 'alerts', title: 'Notices', Icon: Megaphone },
   { id: 'profile', title: 'Profile', Icon: User },
 ];
 

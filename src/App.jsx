@@ -6,7 +6,7 @@ import { Header } from './components/Header';
 import { HomeView } from './components/HomeView';
 import { TicketsView } from './components/TicketsView';
 import { SubmitView } from './components/SubmitView';
-import { AlertsView } from './components/AlertsView';
+import { AnnouncementsView } from './components/AnnouncementsView';
 import { ProfileView } from './components/ProfileView';
 import { TicketDetailView } from './components/TicketDetailView';
 import { LightboxModal } from './components/LightboxModal';
@@ -31,7 +31,15 @@ export default function App() {
   const [lightboxUrl, setLightboxUrl] = useState(null);
   const [tickets, setTickets] = useState([]);
   const [eco, setEco] = useState({ closed: 0, water: 0, power: 0 });
+  const [announcements, setAnnouncements] = useState([]);
   const [showEmergency, setShowEmergency] = useState(false);
+  const [isDark, setIsDark] = useState(false);
+
+  // ── Dark Mode effect ──
+  useEffect(() => {
+    if (isDark) document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
+  }, [isDark]);
 
   // ── Auth listener ──
   useEffect(() => {
@@ -132,7 +140,14 @@ export default function App() {
         setEco({ closed: snap.size, water: w, power: p });
       });
 
-    return () => { unsubTickets(); unsubEco(); };
+    const unsubAnnouncements = db
+      .collection('announcements')
+      .orderBy('createdAt', 'desc')
+      .onSnapshot((snap) => {
+        setAnnouncements(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      });
+
+    return () => { unsubTickets(); unsubEco(); unsubAnnouncements(); };
   }, [user, profile]);
 
   const handleSignOut = () => auth.signOut();
@@ -166,7 +181,7 @@ export default function App() {
   }
 
   // ── Student Portal ──
-  const hasAlerts = tickets.some((t) => t.overdue);
+  const hasAlerts = announcements.length > 0 && new Date().getTime() - (announcements[0].createdAt?.toMillis() || 0) < 86400000;
 
   const renderView = () => {
     switch (activeTab) {
@@ -177,7 +192,7 @@ export default function App() {
       case 'submit':
         return <SubmitView profile={profile} onSubmitted={() => setActiveTab('tickets')} onBack={() => setActiveTab('home')} />;
       case 'alerts':
-        return <AlertsView tickets={tickets} onTicketClick={handleTicketClick} />;
+        return <AnnouncementsView announcements={announcements} profile={profile} />;
       case 'profile':
         return <ProfileView profile={profile} totalTickets={tickets.length} onSignOut={handleSignOut} />;
       case 'detail':
@@ -188,11 +203,11 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-dvh relative">
+    <div className="min-h-dvh relative transition-colors duration-500">
       <div className="app-bg" />
-      <Header profile={profile} hostelName={HOSTEL.name} />
+      <Header profile={profile} hostelName={HOSTEL.name} isDark={isDark} setIsDark={setIsDark} />
 
-      <main className="px-5 pt-3 pb-28 max-w-lg mx-auto">
+      <main className="px-5 pt-3 pb-28 max-w-lg mx-auto relative z-10">
         <AnimatePresence mode="wait">
           <motion.div key={activeTab} variants={pageVariants} initial="initial" animate="animate" exit="exit">
             {renderView()}

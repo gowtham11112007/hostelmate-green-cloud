@@ -24,6 +24,11 @@
   --animate-shimmer: shimmer 2.5s linear infinite;
 }
 
+.dark {
+  --color-surface: rgba(15, 23, 42, 0.88); /* slate-900 */
+  --color-surface-hover: rgba(15, 23, 42, 0.95);
+}
+
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -69,6 +74,11 @@
     min-height: 100dvh;
     color: #0f172a;
     overflow-x: hidden;
+    transition: color 0.4s ease;
+  }
+  
+  .dark body {
+    color: #f8fafc; /* slate-50 */
   }
 }
 
@@ -82,6 +92,15 @@
     radial-gradient(ellipse 60% 50% at 90% 80%, rgba(199, 210, 254, 0.35) 0%, transparent 55%),
     radial-gradient(ellipse 50% 40% at 50% 10%, rgba(253, 230, 138, 0.15) 0%, transparent 50%),
     #f8fafc;
+  transition: background 0.4s ease;
+}
+
+.dark .app-bg {
+  background:
+    radial-gradient(ellipse 80% 60% at 10% 20%, rgba(5, 150, 105, 0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 90% 80%, rgba(79, 70, 229, 0.15) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 10%, rgba(245, 158, 11, 0.05) 0%, transparent 50%),
+    #020617; /* slate-950 */
 }
 
 /* ── Claymorphism Cards ── */
@@ -99,6 +118,14 @@
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.dark .clay-card {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.2),
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 .clay-card:hover {
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.04),
@@ -114,6 +141,12 @@
   backdrop-filter: blur(24px) saturate(1.8);
   -webkit-backdrop-filter: blur(24px) saturate(1.8);
   border: 1px solid rgba(255, 255, 255, 0.6);
+  transition: all 0.4s ease;
+}
+
+.dark .glass-panel {
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* ── Button Styles ── */
@@ -179,9 +212,19 @@
   outline: none;
 }
 
+.dark .clay-input {
+  background: rgba(30, 41, 59, 0.8);
+  color: #f8fafc;
+  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.2), inset -2px -2px 4px rgba(255, 255, 255, 0.05);
+}
+
 .clay-input::placeholder {
   color: #94a3b8;
   font-weight: 500;
+}
+
+.dark .clay-input::placeholder {
+  color: #64748b;
 }
 
 .clay-input:focus {
@@ -190,6 +233,12 @@
   box-shadow:
     inset 1px 1px 2px rgba(163, 177, 198, 0.1),
     0 0 0 4px rgba(16, 185, 129, 0.12);
+}
+
+.dark .clay-input:focus {
+  background: #0f172a;
+  border-color: var(--color-brand-500);
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
 }
 
 /* ── Status Badges ── */

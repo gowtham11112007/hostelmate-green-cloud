@@ -9,6 +9,9 @@ export function StaffDashboard({ onOpenLightbox, onSignOut }) {
   const [filter, setFilter] = useState('all');
   const [query, setQuery] = useState('');
   const [tab, setTab] = useState('queue');
+  const [announcementMsg, setAnnouncementMsg] = useState('');
+  const [announcementFloor, setAnnouncementFloor] = useState('All');
+  const [isImportant, setIsImportant] = useState(false);
 
   useEffect(() => {
     const unsub = db.collection('tickets').orderBy('createdAt', 'desc').onSnapshot((snap) => {
@@ -37,6 +40,26 @@ export function StaffDashboard({ onOpenLightbox, onSignOut }) {
     tickets.forEach((t) => rows.push([t.id.slice(-6), t.category, t.room, t.status, t.overdue ? 'YES' : 'NO'].join(',')));
     const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'sla_report.csv'; a.click();
+  };
+
+  const handlePostAnnouncement = async (e) => {
+    e.preventDefault();
+    if (!announcementMsg.trim()) return;
+    try {
+      await db.collection('announcements').add({
+        message: announcementMsg.trim(),
+        floor: announcementFloor,
+        important: isImportant,
+        author: 'Hostel Admin',
+        createdAt: firebase.firestore.Timestamp.now()
+      });
+      setAnnouncementMsg('');
+      setAnnouncementFloor('All');
+      setIsImportant(false);
+      alert('Announcement posted successfully!');
+    } catch (e) {
+      alert(e.message);
+    }
   };
 
   const filtered = tickets.filter((t) => {
@@ -104,9 +127,9 @@ export function StaffDashboard({ onOpenLightbox, onSignOut }) {
         {/* Tabs + Filters */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex p-1 rounded-2xl bg-white border border-slate-200/60 shadow-sm">
-            {['queue', 'sla'].map((t) => (
+            {['queue', 'sla', 'announcements'].map((t) => (
               <button key={t} onClick={() => setTab(t)} className={`px-5 py-2 rounded-xl text-xs font-bold capitalize transition-all ${tab === t ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-700'}`}>
-                {t === 'sla' ? 'SLA Breaches' : 'Live Queue'}
+                {t === 'sla' ? 'SLA Breaches' : t === 'announcements' ? 'Post Notice' : 'Live Queue'}
               </button>
             ))}
           </div>
@@ -200,6 +223,49 @@ export function StaffDashboard({ onOpenLightbox, onSignOut }) {
                 </motion.div>
               ))
             )}
+          </motion.div>
+        )}
+
+        {/* Announcements Tab */}
+        {tab === 'announcements' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="clay-card p-6 max-w-2xl">
+            <h2 className="text-lg font-extrabold text-slate-900 mb-4">Post an Announcement</h2>
+            <form onSubmit={handlePostAnnouncement} className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-slate-500 block mb-1.5">Message</label>
+                <textarea 
+                  value={announcementMsg}
+                  onChange={(e) => setAnnouncementMsg(e.target.value)}
+                  placeholder="e.g. Water maintenance on Floor 3 today from 2 PM to 4 PM."
+                  className="clay-input min-h-[100px] resize-none"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-500 block mb-1.5">Target Floor</label>
+                  <select value={announcementFloor} onChange={(e) => setAnnouncementFloor(e.target.value)} className="clay-input py-2.5">
+                    <option value="All">All Floors</option>
+                    {Array.from({ length: HOSTEL.floors }, (_, i) => i + 1).map((f) => (
+                      <option key={f} value={f}>Floor {f}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex items-end pb-1">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      checked={isImportant}
+                      onChange={(e) => setIsImportant(e.target.checked)}
+                      className="w-4 h-4 rounded text-brand-500 focus:ring-brand-500"
+                    />
+                    <span className="text-sm font-bold text-slate-700">Mark as Important (Red)</span>
+                  </label>
+                </div>
+              </div>
+              <button type="submit" className="clay-btn w-full py-3 mt-2">
+                Broadcast Notice
+              </button>
+            </form>
           </motion.div>
         )}
       </main>
