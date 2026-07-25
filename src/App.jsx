@@ -46,16 +46,18 @@ export default function App() {
       try {
         const snap = await db.collection('students').doc(currentUser.uid).get();
         const pData = snap.exists ? snap.data() : null;
-        const cleanName =
-          pData?.name && !pData.name.includes('@')
-            ? pData.name
-            : currentUser.email
-                .split('@')[0]
-                .replace(/[._-]/g, ' ')
-                .replace(/\b\w/g, (l) => l.toUpperCase());
+        let cleanName = 'Student';
+        if (pData?.name) {
+          cleanName = pData.name;
+        } else if (currentUser.displayName) {
+          cleanName = currentUser.displayName;
+        } else if (currentUser.email) {
+          cleanName = currentUser.email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+        }
+
         const finalProfile = {
           name: cleanName,
-          email: currentUser.email,
+          email: currentUser.email || '',
           regNo: pData?.regNo || '—',
           floor: pData?.floor || null,
           room: pData?.room || '',
@@ -65,8 +67,8 @@ export default function App() {
         if (finalProfile.role === 'staff') setRoleMode('staff');
       } catch {
         setProfile({
-          name: currentUser.email.split('@')[0],
-          email: currentUser.email,
+          name: currentUser.displayName || currentUser.email?.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'Student',
+          email: currentUser.email || '',
           regNo: '—',
           floor: null,
           room: '',
