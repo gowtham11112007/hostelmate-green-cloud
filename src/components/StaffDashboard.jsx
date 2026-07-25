@@ -36,8 +36,8 @@ export function StaffDashboard({ onOpenLightbox, onSignOut }) {
   };
 
   const handleExport = () => {
-    const rows = [['ID', 'Category', 'Room', 'Status', 'Overdue'].join(',')];
-    tickets.forEach((t) => rows.push([t.id.slice(-6), t.category, t.room, t.status, t.overdue ? 'YES' : 'NO'].join(',')));
+    const rows = [['Name', 'Reg No', 'Category', 'Room', 'Status', 'Overdue'].join(',')];
+    tickets.forEach((t) => rows.push([t.studentName || 'Student', t.regNo || '—', t.category, t.room, t.status, t.overdue ? 'YES' : 'NO'].join(',')));
     const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'sla_report.csv'; a.click();
   };
@@ -158,7 +158,7 @@ export function StaffDashboard({ onOpenLightbox, onSignOut }) {
             <table className="w-full text-left">
               <thead>
                 <tr className="text-xs font-bold uppercase text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-700/50">
-                  <th className="px-5 py-4">ID</th>
+                  <th className="px-5 py-4">Student</th>
                   <th className="px-5 py-4">Photo</th>
                   <th className="px-5 py-4">Category</th>
                   <th className="px-5 py-4">Room</th>
@@ -169,7 +169,10 @@ export function StaffDashboard({ onOpenLightbox, onSignOut }) {
               <tbody className="divide-y divide-slate-100/60 dark:divide-slate-700/50">
                 {filtered.map((t) => (
                   <tr key={t.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/60 transition-colors">
-                    <td className="px-5 py-4 font-mono text-sm font-extrabold text-slate-900 dark:text-white">{t.id.slice(-6).toUpperCase()}</td>
+                    <td className="px-5 py-4">
+                      <p className="text-sm font-extrabold text-slate-900 dark:text-white">{t.studentName || 'Student'}</p>
+                      <p className="text-[11px] font-mono font-bold text-slate-500 dark:text-slate-400 mt-0.5">{t.regNo || '—'}</p>
+                    </td>
                     <td className="px-5 py-4">
                       {t.imageUrl ? (
                         <img src={t.imageUrl} alt="" onClick={() => onOpenLightbox(t.imageUrl)} className="w-9 h-9 object-cover rounded-xl cursor-pointer shadow-sm border border-slate-200/60 hover:scale-110 transition-transform" />
