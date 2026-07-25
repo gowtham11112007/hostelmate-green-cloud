@@ -97,7 +97,6 @@ export function StaffDashboard({ onOpenLightbox, onSignOut }) {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <a href="/" className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1">Student Portal <ArrowRight className="w-3 h-3" /></a>
             <button onClick={onSignOut} className="px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60 text-slate-600 dark:text-slate-300 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm">Sign Out</button>
           </div>
         </div>

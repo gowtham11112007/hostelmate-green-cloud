@@ -52,7 +52,7 @@ export default function App() {
         return;
       }
       try {
-        const snap = await db.collection('students').doc(currentUser.uid).get();
+        const snap = await db.collection('users').doc(currentUser.uid).get();
         const pData = snap.exists ? snap.data() : null;
         let cleanName = 'Student';
         if (pData?.name) {
@@ -67,10 +67,9 @@ export default function App() {
           regNo: pData?.regNo || '—',
           floor: pData?.floor || null,
           room: pData?.room || '',
-          role: pData?.role || roleMode,
+          role: pData?.role || 'student', // default to student if missing
         };
         setProfile(finalProfile);
-        if (finalProfile.role === 'staff') setRoleMode('staff');
       } catch {
         setProfile({
           name: currentUser.displayName || 'Student',
@@ -171,7 +170,7 @@ export default function App() {
   }
 
   // ── Staff ──
-  if (roleMode === 'staff' || profile?.role === 'staff') {
+  if (profile?.role === 'staff') {
     return (
       <>
         <StaffDashboard onOpenLightbox={setLightboxUrl} onSignOut={handleSignOut} />

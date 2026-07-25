@@ -12,6 +12,7 @@ export function LoginScreen({ roleMode, setRoleMode }) {
   const [regNo, setRegNo] = useState('');
   const [floor, setFloor] = useState(1);
   const [room, setRoom] = useState('');
+  const [staffCode, setStaffCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -25,13 +26,16 @@ export function LoginScreen({ roleMode, setRoleMode }) {
       if (authMode === 'login') {
         await auth.signInWithEmailAndPassword(email, password);
       } else {
-        if (!fullName.trim() || !regNo.trim()) { setError('Name and register number are required.'); setLoading(false); return; }
+        if (!fullName.trim()) { setError('Name is required.'); setLoading(false); return; }
+        if (roleMode === 'student' && !regNo.trim()) { setError('Register number is required.'); setLoading(false); return; }
+        if (roleMode === 'staff' && staffCode !== 'HOSTEL2026') { setError('Invalid Staff Access Code.'); setLoading(false); return; }
+        
         const cred = await auth.createUserWithEmailAndPassword(email, password);
-        await db.collection('students').doc(cred.user.uid).set({
+        await db.collection('users').doc(cred.user.uid).set({
           name: fullName.trim(),
-          regNo: regNo.trim(),
-          floor: Number(floor),
-          room: String(room).trim(),
+          regNo: roleMode === 'student' ? regNo.trim() : '—',
+          floor: roleMode === 'student' ? Number(floor) : null,
+          room: roleMode === 'student' ? String(room).trim() : '',
           email: email.trim(),
           role: roleMode,
           hostel: HOSTEL.name,
@@ -148,24 +152,34 @@ export function LoginScreen({ roleMode, setRoleMode }) {
                   <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1.5 ml-1">Full Name</label>
                   <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Ananya Rao" className="clay-input" />
                 </div>
-                <div>
-                  <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1.5 ml-1">Register Number</label>
-                  <input type="text" value={regNo} onChange={(e) => setRegNo(e.target.value)} placeholder="22CS1043" className="clay-input font-mono" />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
+                {roleMode === 'student' && (
+                  <>
+                    <div>
+                      <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1.5 ml-1">Register Number</label>
+                      <input type="text" value={regNo} onChange={(e) => setRegNo(e.target.value)} placeholder="22CS1043" className="clay-input font-mono" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1.5 ml-1">Floor</label>
+                        <select value={floor} onChange={(e) => setFloor(e.target.value)} className="clay-input">
+                          {Array.from({ length: HOSTEL.floors }, (_, i) => i + 1).map((f) => (
+                            <option key={f} value={f}>Floor {f}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1.5 ml-1">Room No.</label>
+                        <input type="text" value={room} onChange={(e) => setRoom(e.target.value)} placeholder="512" className="clay-input font-mono" />
+                      </div>
+                    </div>
+                  </>
+                )}
+                {roleMode === 'staff' && (
                   <div>
-                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1.5 ml-1">Floor</label>
-                    <select value={floor} onChange={(e) => setFloor(e.target.value)} className="clay-input">
-                      {Array.from({ length: HOSTEL.floors }, (_, i) => i + 1).map((f) => (
-                        <option key={f} value={f}>Floor {f}</option>
-                      ))}
-                    </select>
+                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1.5 ml-1">Staff Access Code</label>
+                    <input type="text" value={staffCode} onChange={(e) => setStaffCode(e.target.value)} placeholder="Enter access code" className="clay-input font-mono" />
                   </div>
-                  <div>
-                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1.5 ml-1">Room No.</label>
-                    <input type="text" value={room} onChange={(e) => setRoom(e.target.value)} placeholder="512" className="clay-input font-mono" />
-                  </div>
-                </div>
+                )}
               </motion.div>
             )}
 
