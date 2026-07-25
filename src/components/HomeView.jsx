@@ -25,7 +25,7 @@ export function HomeView({ tickets, profile, onNavigate, onTicketClick, onEmerge
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+        <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
           {greeting}
           <motion.span
             animate={{ rotate: [0, 14, -8, 14, -4, 10, 0] }}
@@ -35,7 +35,7 @@ export function HomeView({ tickets, profile, onNavigate, onTicketClick, onEmerge
             👋
           </motion.span>
         </h2>
-        <p className="text-sm font-medium text-slate-500 mt-0.5">Here's what's happening today</p>
+        <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-0.5">Here's what's happening today</p>
       </motion.div>
 
       {/* 🚨 Emergency Alert Button */}
@@ -99,7 +99,7 @@ export function HomeView({ tickets, profile, onNavigate, onTicketClick, onEmerge
               <span className={`text-2xl font-extrabold ${stat.textColor}`}>{stat.value}</span>
               {stat.unit && <span className="text-xs font-bold text-slate-400 ml-0.5">{stat.unit}</span>}
             </div>
-            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{stat.label}</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">{stat.label}</p>
           </motion.div>
         ))}
       </motion.div>
@@ -129,10 +129,10 @@ export function HomeView({ tickets, profile, onNavigate, onTicketClick, onEmerge
           <Plus className="w-5 h-5 text-white" />
         </motion.div>
         <div className="flex-1 relative z-10">
-          <h3 className="font-extrabold text-slate-900 text-[15px]">Report an Issue</h3>
-          <p className="text-xs font-medium text-slate-500 mt-0.5">Electrical, plumbing, WiFi, furniture faults</p>
+          <h3 className="font-extrabold text-slate-900 dark:text-white text-[15px]">Report an Issue</h3>
+          <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-0.5">Electrical, plumbing, WiFi, furniture faults</p>
         </div>
-        <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-brand-500 group-hover:translate-x-1 transition-all relative z-10" />
+        <ChevronRight className="w-5 h-5 text-slate-300 dark:text-slate-600 group-hover:text-brand-500 group-hover:translate-x-1 transition-all relative z-10" />
       </motion.div>
 
       {/* Hostel Quick Info Card */}
@@ -140,14 +140,14 @@ export function HomeView({ tickets, profile, onNavigate, onTicketClick, onEmerge
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.34 }}
-        className="p-4 rounded-2xl bg-gradient-to-r from-indigo-50/80 to-violet-50/80 border border-indigo-200/40 flex items-center gap-3"
+        className="p-4 rounded-2xl bg-gradient-to-r from-indigo-50/80 to-violet-50/80 dark:from-indigo-900/30 dark:to-violet-900/30 border border-indigo-200/40 dark:border-indigo-800/40 flex items-center gap-3"
       >
-        <div className="w-10 h-10 rounded-2xl bg-indigo-100 flex items-center justify-center shrink-0">
-          <Building2 className="w-5 h-5 text-indigo-600" />
+        <div className="w-10 h-10 rounded-2xl bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center shrink-0">
+          <Building2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
         </div>
         <div className="flex-1">
-          <p className="text-xs font-extrabold text-indigo-900">Krishna Hostel</p>
-          <p className="text-[11px] font-medium text-indigo-600">
+          <p className="text-xs font-extrabold text-indigo-900 dark:text-indigo-100">Krishna Hostel</p>
+          <p className="text-[11px] font-medium text-indigo-600 dark:text-indigo-300">
             {profile?.room ? `Room ${profile.room} · Floor ${profile.floor}` : '8 Floors · 240 Rooms'}
             {' · '}
             {tickets.length} total tickets filed
@@ -164,10 +164,10 @@ export function HomeView({ tickets, profile, onNavigate, onTicketClick, onEmerge
           transition={{ delay: 0.38 }}
           className="flex items-center justify-between mb-4"
         >
-          <h3 className="text-base font-extrabold text-slate-900">Recent Complaints</h3>
+          <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Recent Complaints</h3>
           <button
             onClick={() => onNavigate('tickets')}
-            className="text-xs font-bold text-brand-600 hover:text-brand-700 flex items-center gap-0.5 transition-colors"
+            className="text-xs font-bold text-brand-600 dark:text-brand-400 hover:text-brand-700 flex items-center gap-0.5 transition-colors"
           >
             All ({openCount} open) <ChevronRight className="w-3.5 h-3.5" />
           </button>
@@ -184,10 +184,10 @@ export function HomeView({ tickets, profile, onNavigate, onTicketClick, onEmerge
               animate={{ y: [0, -6, 0] }}
               transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
             >
-              <CheckCircle2 className="w-12 h-12 text-brand-400 mx-auto mb-3" />
+              <CheckCircle2 className="w-12 h-12 text-brand-400 dark:text-brand-500 mx-auto mb-3" />
             </motion.div>
-            <p className="font-extrabold text-slate-800 text-sm">All clear!</p>
-            <p className="text-xs text-slate-500 mt-1">No active complaints right now.</p>
+            <p className="font-extrabold text-slate-800 dark:text-slate-200 text-sm">All clear!</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">No active complaints right now.</p>
           </motion.div>
         ) : (
           <div className="space-y-3">

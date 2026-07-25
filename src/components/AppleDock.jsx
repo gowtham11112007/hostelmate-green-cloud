@@ -63,9 +63,9 @@ function DockItem({ item, mouseX, isActive, hasNotif, onClick }) {
       whileTap={{ scale: 0.85 }}
     >
       {/* Tooltip */}
-      <span className="absolute -top-9 px-2.5 py-1 rounded-lg bg-slate-800 text-white text-[10px] font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none shadow-lg">
+      <span className="absolute -top-9 px-2.5 py-1 rounded-lg bg-slate-800 dark:bg-slate-700 text-white text-[10px] font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none shadow-lg">
         {item.title}
-        <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-800 rotate-45" />
+        <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-800 dark:bg-slate-700 rotate-45" />
       </span>
 
       {/* Icon Container */}
@@ -75,7 +75,7 @@ function DockItem({ item, mouseX, isActive, hasNotif, onClick }) {
             ? 'bg-gradient-to-br from-brand-400 to-brand-600 text-white shadow-lg shadow-brand-500/30'
             : isActive
               ? 'bg-gradient-to-br from-brand-500 to-brand-600 text-white shadow-lg shadow-brand-500/25'
-              : 'bg-white/80 text-slate-500 hover:text-slate-700 hover:bg-white shadow-sm border border-slate-200/50'
+              : 'bg-white/80 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white dark:hover:bg-slate-700 shadow-sm border border-slate-200/50 dark:border-slate-700/50'
         }`}
       >
         <Icon className="w-[42%] h-[42%]" strokeWidth={2.2} />

@@ -36,12 +36,12 @@ export function TicketCard({ ticket, onClick, index = 0 }) {
 
       {/* Title + location */}
       <div>
-        <h4 className="font-extrabold text-slate-900 text-[15px] leading-snug">{ticket.title}</h4>
-        <p className="text-xs font-semibold text-slate-400 mt-1">{ticket.shortIdText} · {ticket.place}</p>
+        <h4 className="font-extrabold text-slate-900 dark:text-white text-[15px] leading-snug">{ticket.title}</h4>
+        <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 mt-1">{ticket.shortIdText} · {ticket.place}</p>
       </div>
 
       {/* SLA footer */}
-      <div className="flex items-center justify-between pt-2.5 border-t border-slate-100/80">
+      <div className="flex items-center justify-between pt-2.5 border-t border-slate-100/80 dark:border-slate-700/50">
         <span
           className={`status-badge ${
             ticket.overdue
@@ -55,7 +55,7 @@ export function TicketCard({ ticket, onClick, index = 0 }) {
           {ticket.slaText}
         </span>
 
-        <ChevronRight className="w-4 h-4 text-slate-300" />
+        <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600" />
       </div>
     </motion.div>
   );

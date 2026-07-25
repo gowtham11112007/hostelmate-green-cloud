@@ -80,8 +80,8 @@ export function LoginScreen({ roleMode, setRoleMode }) {
           transition={{ delay: 0.2 }}
           className="text-center mb-8"
         >
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">HostelMate</h1>
-          <p className="text-sm font-medium text-slate-500 mt-1">Smart Hostel Maintenance System</p>
+          <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">HostelMate</h1>
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">Smart Hostel Maintenance System</p>
         </motion.div>
 
         {/* Main Card */}
@@ -92,7 +92,7 @@ export function LoginScreen({ roleMode, setRoleMode }) {
           className="clay-card p-7 space-y-6"
         >
           {/* Role Toggle */}
-          <div className="flex p-1 rounded-2xl bg-slate-100 border border-slate-200/60">
+          <div className="flex p-1 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60">
             {[
               { id: 'student', label: 'Student', icon: GraduationCap, color: 'text-brand-700' },
               { id: 'staff', label: 'Staff', icon: Wrench, color: 'text-indigo-700' },
@@ -103,8 +103,8 @@ export function LoginScreen({ roleMode, setRoleMode }) {
                 onClick={() => setRoleMode(r.id)}
                 className={`flex-1 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all duration-300 ${
                   roleMode === r.id
-                    ? `bg-white ${r.color} shadow-md shadow-slate-200/50`
-                    : 'text-slate-400 hover:text-slate-600'
+                    ? `bg-white dark:bg-slate-700 ${r.color} shadow-md shadow-slate-200/50 dark:shadow-none`
+                    : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
                 }`}
               >
                 <r.icon className="w-4 h-4" />
@@ -114,7 +114,7 @@ export function LoginScreen({ roleMode, setRoleMode }) {
           </div>
 
           {/* Auth Mode Toggle */}
-          <div className="flex p-1 rounded-xl bg-slate-100 border border-slate-200/60">
+          <div className="flex p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60">
             {[
               { id: 'login', label: 'Log in', icon: LogIn },
               { id: 'signup', label: 'Sign up', icon: UserPlus },
@@ -123,8 +123,10 @@ export function LoginScreen({ roleMode, setRoleMode }) {
                 key={a.id}
                 type="button"
                 onClick={() => { setAuthMode(a.id); setError(''); }}
-                className={`flex-1 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-300 ${
-                  authMode === a.id ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'
+                className={`flex-1 py-2 rounded-lg text-[13px] font-bold flex items-center justify-center gap-2 transition-all ${
+                  authMode === a.id
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                    : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
                 }`}
               >
                 <a.icon className="w-3.5 h-3.5" />
@@ -143,16 +145,16 @@ export function LoginScreen({ roleMode, setRoleMode }) {
                 className="space-y-4 overflow-hidden"
               >
                 <div>
-                  <label className="text-xs font-bold text-slate-500 block mb-1.5">Full Name</label>
+                  <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1.5 ml-1">Full Name</label>
                   <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Ananya Rao" className="clay-input" />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-slate-500 block mb-1.5">Register Number</label>
+                  <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1.5 ml-1">Register Number</label>
                   <input type="text" value={regNo} onChange={(e) => setRegNo(e.target.value)} placeholder="22CS1043" className="clay-input font-mono" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs font-bold text-slate-500 block mb-1.5">Floor</label>
+                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1.5 ml-1">Floor</label>
                     <select value={floor} onChange={(e) => setFloor(e.target.value)} className="clay-input">
                       {Array.from({ length: HOSTEL.floors }, (_, i) => i + 1).map((f) => (
                         <option key={f} value={f}>Floor {f}</option>
@@ -160,7 +162,7 @@ export function LoginScreen({ roleMode, setRoleMode }) {
                     </select>
                   </div>
                   <div>
-                    <label className="text-xs font-bold text-slate-500 block mb-1.5">Room</label>
+                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1.5 ml-1">Room No.</label>
                     <input type="text" value={room} onChange={(e) => setRoom(e.target.value)} placeholder="512" className="clay-input font-mono" />
                   </div>
                 </div>
