@@ -1,12 +1,55 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, MapPin, Hash, LogOut, Award, Building2, Leaf } from 'lucide-react';
-import { HOSTEL } from '../lib/firebase';
+import { Mail, MapPin, Hash, LogOut, Award, Building2, Leaf, Edit2, Check, X } from 'lucide-react';
+import firebase, { db, auth, HOSTEL } from '../lib/firebase';
 
 export function ProfileView({ profile, totalTickets, onSignOut }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState(profile?.name || '');
+  const [editRegNo, setEditRegNo] = useState(profile?.regNo === '—' ? '' : profile?.regNo || '');
+  const [saving, setSaving] = useState(false);
+
   const name = profile?.name || 'Student';
   const email = profile?.email || '';
   const regNo = profile?.regNo || '—';
   const initials = name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2);
+
+  const handleSave = async () => {
+    if (!auth.currentUser) return;
+    setSaving(true);
+    try {
+      const uid = auth.currentUser.uid;
+      const snap = await db.collection('students').doc(uid).get();
+      if (snap.exists) {
+        await db.collection('students').doc(uid).update({
+          name: editName.trim(),
+          regNo: editRegNo.trim() || '—'
+        });
+      } else {
+        await db.collection('students').doc(uid).set({
+          name: editName.trim(),
+          regNo: editRegNo.trim() || '—',
+          email: auth.currentUser.email,
+          role: 'student',
+          createdAt: firebase.firestore.Timestamp.now()
+        });
+      }
+      
+      // Also update Firebase Auth profile
+      await auth.currentUser.updateProfile({
+        displayName: editName.trim()
+      });
+      
+      setIsEditing(false);
+      // Let the onSnapshot in App.jsx (or auth listener) handle the UI update, 
+      // but since auth listener only fires on login, we might need to reload or let the user know.
+      window.location.reload(); 
+    } catch (e) {
+      alert('Failed to update profile: ' + e.message);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="space-y-5">
@@ -14,8 +57,17 @@ export function ProfileView({ profile, totalTickets, onSignOut }) {
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="clay-card p-8 text-center"
+        className="clay-card p-8 text-center relative"
       >
+        {!isEditing && (
+          <button 
+            onClick={() => setIsEditing(true)}
+            className="absolute top-4 right-4 p-2 rounded-xl bg-slate-50 text-slate-400 hover:text-brand-600 hover:bg-brand-50 transition-colors"
+          >
+            <Edit2 className="w-4 h-4" />
+          </button>
+        )}
+
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -25,10 +77,52 @@ export function ProfileView({ profile, totalTickets, onSignOut }) {
           {initials}
         </motion.div>
 
-        <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">{name}</h2>
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-50 text-brand-700 text-xs font-bold mt-2 border border-brand-200/40">
-          <Mail className="w-3 h-3" /> {email}
-        </div>
+        {isEditing ? (
+          <div className="space-y-3 mt-4 text-left">
+            <div>
+              <label className="text-[10px] font-bold uppercase text-slate-400 ml-1">Full Name</label>
+              <input 
+                type="text" 
+                value={editName} 
+                onChange={(e) => setEditName(e.target.value)}
+                className="clay-input py-2 text-sm"
+                placeholder="e.g. John Doe"
+              />
+            </div>
+            <div>
+              <label className="text-[10px] font-bold uppercase text-slate-400 ml-1">Reg Number</label>
+              <input 
+                type="text" 
+                value={editRegNo} 
+                onChange={(e) => setEditRegNo(e.target.value)}
+                className="clay-input py-2 text-sm font-mono"
+                placeholder="e.g. 22CS1043"
+              />
+            </div>
+            <div className="flex gap-2 pt-2">
+              <button 
+                onClick={() => setIsEditing(false)}
+                className="flex-1 py-2 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs flex items-center justify-center gap-1"
+              >
+                <X className="w-3.5 h-3.5" /> Cancel
+              </button>
+              <button 
+                onClick={handleSave}
+                disabled={saving}
+                className="flex-1 py-2 rounded-xl bg-brand-500 text-white font-bold text-xs flex items-center justify-center gap-1 shadow-md shadow-brand-500/30"
+              >
+                {saving ? 'Saving...' : <><Check className="w-3.5 h-3.5" /> Save</>}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
+            <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">{name}</h2>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-50 text-brand-700 text-xs font-bold mt-2 border border-brand-200/40">
+              <Mail className="w-3 h-3" /> {email}
+            </div>
+          </>
+        )}
       </motion.div>
 
       {/* Info Grid */}
