@@ -52,7 +52,11 @@ export default function App() {
         return;
       }
       try {
-        const snap = await db.collection('users').doc(currentUser.uid).get();
+        // Check `users` first (new accounts), then fall back to `students` (legacy accounts)
+        let snap = await db.collection('users').doc(currentUser.uid).get();
+        if (!snap.exists) {
+          snap = await db.collection('students').doc(currentUser.uid).get();
+        }
         const pData = snap.exists ? snap.data() : null;
         let cleanName = 'Student';
         if (pData?.name) {
@@ -67,7 +71,7 @@ export default function App() {
           regNo: pData?.regNo || '—',
           floor: pData?.floor || null,
           room: pData?.room || '',
-          role: pData?.role || 'student', // default to student if missing
+          role: pData?.role || 'student',
         };
         setProfile(finalProfile);
       } catch {
