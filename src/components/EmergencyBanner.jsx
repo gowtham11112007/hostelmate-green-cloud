@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Siren, MapPin, Clock, CheckCircle, X } from 'lucide-react';
 import { db } from '../lib/firebase';
@@ -6,19 +6,75 @@ import firebase from '../lib/firebase';
 
 export function EmergencyBanner() {
   const [emergencies, setEmergencies] = useState([]);
+  const audioRef = useRef(null);
+
+  // Play alert sound when new emergencies arrive
+  useEffect(() => {
+    if (emergencies.length > 0 && !audioRef.current) {
+      try {
+        // Use Web Audio API for a notification beep
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = 880;
+        osc.type = 'sine';
+        gain.gain.value = 0.3;
+        osc.start();
+        osc.stop(ctx.currentTime + 0.3);
+        audioRef.current = true;
+        setTimeout(() => { audioRef.current = null; }, 5000);
+      } catch (_) {
+        // Audio not supported — ignore
+      }
+    }
+  }, [emergencies.length]);
 
   useEffect(() => {
-    const unsub = db.collection('emergencies')
-      .where('status', '==', 'active')
-      .orderBy('createdAt', 'desc')
-      .onSnapshot((snap) => {
-        setEmergencies(snap.docs.map((d) => ({
-          id: d.id,
-          ...d.data(),
-          timeAgo: d.data().createdAt ? getTimeAgo(d.data().createdAt.toMillis()) : 'just now',
-        })));
+    const processSnapshot = (snap) => {
+      const active = snap.docs
+        .map((d) => ({ id: d.id, ...d.data() }))
+        .filter((e) => e.status === 'active')
+        .map((e) => ({
+          ...e,
+          timeAgo: e.createdAt ? getTimeAgo(e.createdAt.toMillis()) : 'just now',
+        }));
+      // Sort client-side to ensure newest first
+      active.sort((a, b) => {
+        const aTime = a.createdAt ? a.createdAt.toMillis() : 0;
+        const bTime = b.createdAt ? b.createdAt.toMillis() : 0;
+        return bTime - aTime;
       });
-    return () => unsub();
+      setEmergencies(active);
+    };
+
+    // Track active unsubscribe so fallback can replace it cleanly
+    let activeUnsub = null;
+    let isMounted = true;
+
+    // Try ordered query first; fall back to unordered if index is missing
+    activeUnsub = db.collection('emergencies')
+      .orderBy('createdAt', 'desc')
+      .onSnapshot(processSnapshot, (err) => {
+        console.warn('Ordered emergency query failed, falling back:', err.message);
+        if (!isMounted) return;
+        // Fallback: listen without orderBy (no composite index needed)
+        activeUnsub = db.collection('emergencies')
+          .where('status', '==', 'active')
+          .onSnapshot(processSnapshot, (fallbackErr) => {
+            console.error('EmergencyBanner fallback listener error:', fallbackErr);
+            if (!isMounted) return;
+            // Final fallback: get all emergencies, filter client-side
+            activeUnsub = db.collection('emergencies')
+              .onSnapshot(processSnapshot, () => {});
+          });
+      });
+
+    return () => {
+      isMounted = false;
+      if (activeUnsub) activeUnsub();
+    };
   }, []);
 
   const handleResolve = async (id) => {
